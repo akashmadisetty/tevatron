@@ -23,12 +23,12 @@ class TevatronTrainer(Trainer):
         os.makedirs(output_dir, exist_ok=True)
         logger.info(f"Saving model checkpoint to {output_dir}")
 
-        # Check if the model has a save method (like DSEModel)
-        if hasattr(self.model, 'save') and callable(getattr(self.model, 'save')):
-            logger.info(f"Using model's save method for {type(self.model).__name__}")
-            self.model.save(output_dir)
-        elif isinstance(self.model, EncoderModel):
-            # Original logic for EncoderModel
+        supported_classes = (EncoderModel,)
+        # Save a trained model and configuration using `save_pretrained()`.
+        # They can then be reloaded using `from_pretrained()`
+        if not isinstance(self.model, supported_classes):
+            raise ValueError(f"Unsupported model class {self.model}")
+        else:
             if state_dict is None:
                 state_dict = self.model.state_dict()
             prefix = 'encoder.'
@@ -37,8 +37,6 @@ class TevatronTrainer(Trainer):
             self.model.encoder.save_pretrained(
                 output_dir, state_dict=state_dict, safe_serialization=self.args.save_safetensors
             )
-        else:
-            raise ValueError(f"Unsupported model class {self.model}")
 
         if self.tokenizer is not None:
             self.tokenizer.save_pretrained(output_dir)
@@ -52,4 +50,3 @@ class TevatronTrainer(Trainer):
 
     def training_step(self, *args):
         return super(TevatronTrainer, self).training_step(*args) / self._dist_loss_scale_factor
-
