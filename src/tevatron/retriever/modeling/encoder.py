@@ -5,7 +5,7 @@ import torch
 import torch.distributed as dist
 from torch import nn, Tensor
 
-from transformers import PreTrainedModel, AutoModel, Qwen2VLForConditionalGeneration
+from transformers import PreTrainedModel, AutoModel
 from peft import LoraConfig, TaskType, get_peft_model, PeftModel
 
 from transformers.file_utils import ModelOutput
@@ -24,7 +24,7 @@ class EncoderOutput(ModelOutput):
 
 
 class EncoderModel(nn.Module):
-    TRANSFORMER_CLS = Qwen2VLForConditionalGeneration
+    TRANSFORMER_CLS = AutoModel
 
     def __init__(self,
                  encoder: PreTrainedModel,

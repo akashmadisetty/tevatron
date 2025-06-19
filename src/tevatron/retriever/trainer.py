@@ -52,3 +52,4 @@ class TevatronTrainer(Trainer):
 
     def training_step(self, *args):
         return super(TevatronTrainer, self).training_step(*args) / self._dist_loss_scale_factor
+
